@@ -1,0 +1,108 @@
+题目描述
+####################################BEGIN
+描述
+定义一个二维数组： 
+int maze[5][5] = {
+0, 1, 0, 0, 0,
+0, 1, 0, 1, 0,
+0, 0, 0, 0, 0,
+0, 1, 1, 1, 0,
+0, 0, 0, 1, 0,
+};
+
+它表示一个迷宫，其中的1表示墙壁，0表示可以走的路，只能横着走或竖着走，不能斜着走，要求编程序找出从左上角到右下角的最短路线。
+
+输入
+一个5 × 5的二维数组，表示一个迷宫。数据保证有唯一解。
+输出
+左上角到右下角的最短路径，格式如样例所示。
+样例输入
+0 1 0 0 0
+0 1 0 1 0
+0 0 0 0 0
+0 1 1 1 0
+0 0 0 1 0
+样例输出
+(0, 0)
+(1, 0)
+(2, 0)
+(2, 1)
+(2, 2)
+(2, 3)
+(2, 4)
+(3, 4)
+(4, 4)
+####################################END
+
+代码展示
+###################################BEGIN
+#include<iostream>
+#include<cstdio>
+#include<queue>
+#include<cstring>
+using namespace std;
+int map[6][6];
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+struct pos
+{
+	int x, y, step;
+	pos(int _x, int _y, int _step){
+		x = _x;
+		y = _y;
+		step = _step;
+	}
+	pos(){}
+}answer[25]; 
+int flag[6][6] = {0};
+bool can(int x, int y){
+	if(x >= 0 && x < 5 && y >= 0 && y < 5 && !flag[x][y] && !map[x][y]) return true;
+	return false;
+}
+queue<pos>q;
+int main()
+{
+	for(int i = 0; i < 5; i++)
+		for(int j = 0; j < 5; j++)
+			cin >> map[i][j];
+			
+
+	q.push(pos(0, 0, 1));
+	flag[0][0] = 1;
+	while(!q.empty())
+	{
+		pos now = q.front();
+		q.pop();
+		if(now.x == 4 && now.y == 4)break;
+		for(int i = 0; i < 4; i++)
+			if(can(now.x + dx[i], now.y + dy[i]))
+			{
+				q.push(pos(now.x + dx[i], now.y + dy[i], now.step+1));
+				flag[now.x + dx[i]][now.y + dy[i]] = now.step + 1;
+			}
+	}
+	while(!q.empty())
+		q.pop();
+	
+	int step = flag[4][4];
+	q.push(pos(4, 4, step));
+	answer[step].x = 4;
+	answer[step].y = 4;
+	while(!q.empty())
+	{
+		pos now = q.front();
+		q.pop();
+		for(int i = 0; i < 4; i++)
+			if(now.x + dx[i] >= 0 && now.x + dx[i]<5 && now.y + dy[i]>=0 && now.y + dy[i] < 5 && 
+			flag[now.x + dx[i]][now.y + dy[i]] == now.step - 1 && flag[now.x + dx[i]][now.y + dy[i]] != 0)
+			{
+				q.push(pos(now.x + dx[i], now.y + dy[i], now.step - 1));
+				answer[now.step - 1].x = now.x + dx[i];
+				answer[now.step - 1].y = now.y + dy[i];
+			}
+	}
+	for(int i = 1; i <= step; i++)
+		cout << "(" << answer[i].x << ", " << answer[i].y << ")" << endl;
+	return 0;
+}
+#####################################END
