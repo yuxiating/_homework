@@ -1,0 +1,119 @@
+題目描述
+###########################################################################BEGIN
+描述
+现在有一些英语单词需要做拼写检查，你的工具是一本词典。需要检查的单词，有的是词典中的单词，有的与词典中的单词相似，你的任务是发现这两种情况。单词A与单词B相似的情况有三种：
+1、删除单词A的一个字母后得到单词B；
+2、用任意一个字母替换单词A的一个字母后得到单词B；
+3、在单词A的任意位置增加一个字母后得到单词B。
+你的任务是发现词典中与给定单词相同或相似的单词。
+
+输入
+第一部分是词典中的单词，从第一行开始每行一个单词，以"#"结束。词典中的单词保证不重复，最多有10000个。
+第二部分是需要查询的单词，每行一个，以"#"结束。最多有50个需要查询的单词。
+词典中的单词和需要查询的单词均由小写字母组成，最多包含15个字符。
+输出
+按照输入的顺序，为每个需要检查的单词输出一行。如果需要检查的单词出现在词典中，输出“?x is correct"，?x代表需要检查的单词。如果需要检查的单词没有出现在词典中，则输出"?x: ?x1 ?x2 ...?xn"，其中?x代表需要检查的单词，?x1...?xn代表词典中与需要检查的单词相似的单词，这些单词中间以空格隔开。如果没有相似的单词，输出"?x:"即可。
+样例输入
+i
+is
+has
+have
+be
+my
+more
+contest
+me
+too
+if
+award
+#
+me
+aware
+m
+contest
+hav
+oo
+or
+i
+fi
+mre
+#
+样例输出
+me is correct
+aware: award
+m: i my me
+contest is correct
+hav: has have
+oo: too
+or:
+i is correct
+fi: i
+mre: more me
+###########################################################################END
+
+代碼展示
+###########################################################################BEGIN
+#include<iostream>
+#include<cstring>
+using namespace std;
+#define MAX 10000+2
+
+string direction[MAX], input;
+int flag = 0, cnt = 0;
+bool same(string s1, string s2){
+	int num = 0;
+	//替換 
+	if(s1.length() == s2.length()){
+		for(int i = 0; i < s1.length(); i++)
+			if(s1[i] != s2[i]) num++;
+		
+		if(num >= 2)return false;
+		return true;
+	}
+	
+	if(s1.length() - s2.length() == 1 || s1.length() - s2.length() == -1){
+		string str1 = s1, str2 = s2;
+		if(s2.length() < s1.length())
+			str1 = s2, str2 = s1;
+			
+		if(str1 == str2.substr(0, str2.length() - 1))return true;
+		
+		for(int i = 0; i < str2.length()-1; i++){
+			if(str1[i] != str2[i] && !num)
+				num = 1;
+			if(num && str1[i] != str2[i+1])
+			  return false;
+		}
+		return true;
+	}
+	return false;
+}
+bool judge(string s1){
+	cout<<s1;
+	for(int i = 0; i < cnt; i++)
+		if(s1 == direction[i]){
+			cout<<" is correct"<<endl;
+			return true;
+		}
+		
+	cout<<":";
+	for(int i = 0; i < cnt; i++)
+		if(same(s1, direction[i]))
+			cout<<" "<<direction[i];
+	cout<<endl;
+	
+	return true;
+}
+int main(){
+	while(true){
+		cin >> input;
+		if(input=="#"){
+			flag++;
+			if(flag == 2)break;
+			continue;
+		}
+		if(!flag) direction[cnt++] = input;
+		if(flag) judge(input);
+	}
+} 
+###########################################################################END
